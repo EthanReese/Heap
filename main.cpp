@@ -8,46 +8,76 @@
 #include <iomanip>
 #include <vector>
 #include <sstream>
+#include <fstream>
 
 void addHeap(int element, int heap[128]);
 void printHeap(int heap[128]);
+void destroyHeap(int heap[128]);
 
 using namespace std;
 
 int main(){
      bool going = true;
-     cout << "Enter your numbers and enter the character N when done." << endl;
      //Keep getting inputs until the user asks to stop
      int counter = 0;
      char* input;
      int heap[128] = { 0 };
-     while(going){
-          cout << "Number: ";
-          input = new char[80];
-          cin >> input;
-          //If the user inputs the N then it needs to stop
-          if(strcmp(input, "N") == 0){
-               going = false;
-               delete input;
-               printHeap(heap);  
-          }
-          else if(counter == 100){
-               going = false;
-               delete input;
-               printHeap(heap);  
-          }
-          else{
-                  //put the input into a string stream to convert it into aninteger for comparison
-                  stringstream convert;
-                  convert << input;
-                  int element = 0;
-                  convert >> element;
-                  counter++;
-                  delete input;
-                  addHeap(element, heap);
-          }
-
+     cout << "Enter the character I if you would like to be prompted for input: " << endl;
+     char* input_1;
+     input_1 = new char[80];
+     cin >> input_1;
+     if(strcmp(input_1, "I") == 0){     
+          cout << "Enter your numbers and enter the character N when done." << endl;
+             while(going){
+                  cout << "Number: ";
+                  input = new char[80];
+                  cin >> input;
+                  //If the user inputs the N then it needs to stop
+                  if(strcmp(input, "N") == 0){
+                       going = false;
+                       delete input;
+                       printHeap(heap);
+                       destroyHeap(heap);  
+                  }
+                  else if(counter == 100){
+                       going = false;
+                       delete input;
+                       printHeap(heap);  
+                  }
+                  else if(strcmp(input, "0") == 0){
+                       //If its zero is screws things up so just ignore it since its not in the range anyway.
+                  }
+                  else{
+                          //put the input into a string stream to convert it into aninteger for comparison
+                          stringstream convert;
+                          convert << input;
+                          int element = 0;
+                          convert >> element;
+                          counter++;
+                          delete input;
+                          addHeap(element, heap);
+                  }
+             }
      }
+     else{
+          cout << "Please enter the filename of the file you would like to read in: ";
+          input = new char[1000];
+          cin >> input;
+          //Create a stream to open the file
+          ifstream inFile;
+          inFile.open(input);
+          if(!inFile){
+               return 1;
+          }
+          int x;
+          while( inFile >> x){
+               addHeap(x, heap);
+          }
+          printHeap(heap);
+          destroyHeap(heap);
+          delete input;
+     }
+     delete input_1;
      return 0;
 }
 
@@ -99,4 +129,56 @@ void printHeap(int heap[128]){
           }
           cout << endl;
      }
+}
+//Take apart the heap piece by piece
+void destroyHeap(int heap[128]){
+     while(heap[2] != 0){
+          //Print out the root so that its output for sure.
+          cout << heap[1] << endl;
+          int parentInd = 1;
+          int leftInd = 2;
+          int rightInd = 3;
+          //Remove the element that has been printed out
+          while(heap[leftInd] != 0 || heap[rightInd] != 0){
+               //Elevate the larger child and keep looping through
+               if(heap[leftInd] > heap[rightInd]){
+                    heap[parentInd] = heap[leftInd];
+                    heap[leftInd] = 0;
+                    parentInd = leftInd;
+               }
+               else if(heap[rightInd] > heap[leftInd]){
+                    heap[parentInd] = heap[rightInd];
+                    heap[rightInd] = 0;
+                    parentInd = rightInd;
+               }
+               //If they're equal check which has the biggest next child
+               else{
+                    int max = 0;
+                    int maxInd = 0;
+                    //If none of them have any children it will just default to left bc it doesn't matter
+                    if(heap[(leftInd*2)] >= max){
+                         max = heap[leftInd*2];
+                         maxInd = leftInd;
+                    }
+                    if(heap[(leftInd*2)+1] > max){
+                         max = heap[(leftInd*2)+1];
+                         maxInd = leftInd; 
+                    }
+                    if(heap[(rightInd*2)] > max){
+                         max = heap[rightInd*2];
+                         maxInd = rightInd;
+                    }
+                    if(heap[(rightInd*2)+1] > max){
+                         max = heap[(rightInd*2)+1];
+                         maxInd = rightInd;
+                    }
+                    heap[maxInd] = 0;
+                    parentInd = maxInd;
+               }
+               //Adjust the child measurments
+               leftInd = 2*parentInd;
+               rightInd = (2*parentInd)+1;
+          }
+     }
+     cout << heap[1] << endl;
 }
