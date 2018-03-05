@@ -132,6 +132,8 @@ void printHeap(int heap[128]){
 }
 //Take apart the heap piece by piece
 void destroyHeap(int heap[128]){
+     int max;
+     int maxInd;
      while(heap[2] != 0){
           //Print out the root so that its output for sure.
           cout << heap[1] << endl;
@@ -141,7 +143,7 @@ void destroyHeap(int heap[128]){
           //Remove the element that has been printed out
           while(heap[leftInd] != 0 || heap[rightInd] != 0){
                //Elevate the larger child and keep looping through
-               if(heap[leftInd] > heap[rightInd]){
+               if(heap[leftInd] >= heap[rightInd]){
                     heap[parentInd] = heap[leftInd];
                     heap[leftInd] = 0;
                     parentInd = leftInd;
@@ -153,23 +155,23 @@ void destroyHeap(int heap[128]){
                }
                //If they're equal check which has the biggest next child
                else{
-                    int max = 0;
-                    int maxInd = 0;
+                    max = 0;
+                    maxInd = 0;
                     //If none of them have any children it will just default to left bc it doesn't matter
                     if(heap[(leftInd*2)] >= max){
-                         max = heap[leftInd*2];
+                         max = heap[(leftInd*2)];
                          maxInd = leftInd;
                     }
-                    if(heap[(leftInd*2)+1] > max){
-                         max = heap[(leftInd*2)+1];
+                    if(heap[((leftInd*2)+1)] > max){
+                         max = heap[((leftInd*2)+1)];
                          maxInd = leftInd; 
                     }
                     if(heap[(rightInd*2)] > max){
-                         max = heap[rightInd*2];
+                         max = heap[(rightInd*2)];
                          maxInd = rightInd;
                     }
-                    if(heap[(rightInd*2)+1] > max){
-                         max = heap[(rightInd*2)+1];
+                    if(heap[((rightInd*2)+1)] > max){
+                         max = heap[((rightInd*2)+1)];
                          maxInd = rightInd;
                     }
                     heap[maxInd] = 0;
